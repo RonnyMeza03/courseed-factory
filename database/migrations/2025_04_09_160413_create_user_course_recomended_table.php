@@ -15,6 +15,10 @@ return new class extends Migration
             $collection->id();
             $collection->string('userId');
             $collection->string('courseId');
+            $collection->float('ratingAvg')->default(0);
+            $collection->string('maxReaction')->default('none');
+            $collection->integer('visitsCount')->default(0);
+            $collection->integer('reviewsCount')->default(0);
             $collection->boolean('recomended')->default(false);
             $collection->string('createdAt')->default(now());
             $collection->string('updatedAt')->default(now());

@@ -39,6 +39,11 @@ class UserProfile extends EloquentModel
         return $this->belongsTo(User::class, 'userId');
     }
 
+    public function interest()
+    {
+        return $this->hasMany(UserInterest::class, 'userId');
+    }
+
     public function userCourseRecomended()
     {
         return $this->hasMany(UserCourseRecomended::class, 'userId');

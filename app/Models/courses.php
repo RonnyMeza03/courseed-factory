@@ -58,7 +58,9 @@ class Courses extends EloquentModel
         return $this->belongsTo(Categories::class, 'categoryId', 'id');
     }
 
-    public function contents(){
-        return $this->hasMany(Categories::class);
+    public function userCourseRecomended()
+    {
+        return $this->hasMany(UserCourseRecomended::class, 'courseId');
     }
+    
 }

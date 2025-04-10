@@ -2,11 +2,13 @@
 
 namespace Database\Factories;
 
-
+use App\Models\Categories;
 use App\Models\Courses;
 use App\Models\Reaction;
 use App\Models\Reviews;
 use App\Models\User;
+use App\Models\UserCourseRecomended;
+use App\Models\UserInterest;
 use App\Models\UserProfile;
 use App\Models\View;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -1120,7 +1122,6 @@ class UserFactory extends Factory
         "67d06955f19f49ee6243dbcc",
         "67d06955f19f49ee6243dbd4",
         "67d06955f19f49ee6243dbdd",
-        "67d06955f19f49ee6243dbe3",
         "67d06955f19f49ee6243dbea",
         "67d06955f19f49ee6243dbf2",
         "67d06955f19f49ee6243dbfa",
@@ -1130,39 +1131,6 @@ class UserFactory extends Factory
     ];
     
     public $rating = [1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5];
-
-    public $areasDeEstudio = [
-        'Ingeniería Civil',
-        'Ingeniería de Sistemas',
-        'Ingeniería Industrial',
-        'Ingeniería Electrónica',
-        'Ciencias de la Computación',
-        'Matemáticas',
-        'Física',
-        'Química',
-        'Biología',
-        'Medicina',
-        'Odontología',
-        'Enfermería',
-        'Psicología',
-        'Derecho',
-        'Administración de Empresas',
-        'Contaduría Pública',
-        'Economía',
-        'Finanzas',
-        'Marketing',
-        'Comunicación Social',
-        'Periodismo',
-        'Filosofía',
-        'Historia',
-        'Ciencias Políticas',
-        'Antropología',
-        'Sociología',
-        'Arquitectura',
-        'Diseño Gráfico',
-        'Educación',
-        'Lenguas Extranjeras',
-    ];
 
     public $reviews = [3, 4, 5];
 
@@ -1175,14 +1143,19 @@ class UserFactory extends Factory
         $faker = FakerFactory::create('es_ES');
         return $this->afterCreating(function (User $user) {
 
-            $this->courseRecomended($user->id);
+            $categories = Categories::all();
 
-            UserProfile::factory()->create([
+            $userProfile = UserProfile::factory()->create([
                 'userId' => $user->id,
                 'knowledgeArea' => 'Contaduria',
                 'availableTime' => 2,
                 'budget' => 3000000,
                 'platformPreference' => 'Presencial'
+            ]);
+
+            UserInterest::factory(1)->create([
+                'userProfileId' => $userProfile->id,
+                'categoryId' => $categories->random()->id
             ]);
 
             // Crear copia del array para ir eliminando elementos utilizados
@@ -1240,6 +1213,8 @@ class UserFactory extends Factory
                     'userId' => $user->id
                 ]);
             }
+            $courseRecomendedUser = $this->courseRecomended($userProfile->id);
+            // var_dump($courseRecomendedUser);
         });
 
 
@@ -1248,12 +1223,38 @@ class UserFactory extends Factory
     public function courseRecomended($userId)
     {
         $courses = Courses::with('category')->get();
+        $userCoursesRecomended = [];
 
         foreach($courses as $course)
         {
+
+            $courseReviews = Reviews::where('courseId', $course->id)->get();
+
+            $maxReaction = Reaction::where('courseId', $course->id);
+
+            $totalViews = View::where('courseId', $course->id)->count();
+
+            $averageRating = $courseReviews->avg('rating');
+            $averageRating = $averageRating ?? 0; // Set to 0 if null
+
+            $maxReaction = $maxReaction->max('type');
+            $maxReaction = $maxReaction ?? 'none'; // Set to 'none' if null
+            var_dump($totalViews);
+
             // var_dump($course->toJson(JSON_PRETTY_PRINT));
-            var_dump($course->category->name);
+            $courseRecomended = UserCourseRecomended::factory()->create([
+                'userProfileId' => $userId,
+                'courseId' => $course->id,
+                'ratingAvg' => $averageRating, 
+                'maxReaction' => $maxReaction,
+                'totalViews' => $totalViews,
+                'reviewsCount' => $courseReviews->count(),
+                'recomended' => $this->faker->boolean(50),
+            ]);
+            $userCoursesRecomended[] = $courseRecomended;
         }
+
+        return $userCoursesRecomended;
     }
 
     public function selectedRating(String $selectedReaction)

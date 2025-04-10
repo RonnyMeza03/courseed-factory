@@ -34,4 +34,9 @@ class Categories extends EloquentModel
     public function courses(){
         return $this->hasMany(Courses::class);
     }
+
+    public function userInterest()
+    {
+        return $this->hasMany(UserInterest::class, 'categoryId');
+    }
 }
