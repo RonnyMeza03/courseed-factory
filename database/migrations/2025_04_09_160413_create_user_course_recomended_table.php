@@ -15,6 +15,9 @@ return new class extends Migration
             $collection->id();
             $collection->string('userId');
             $collection->string('courseId');
+            $collection->string('courseCategory')->default('none');
+            $collection->string('courseModality')->default('none');
+            $collection->int('courseHours')->default(0);
             $collection->float('ratingAvg')->default(0);
             $collection->string('maxReaction')->default('none');
             $collection->integer('visitsCount')->default(0);

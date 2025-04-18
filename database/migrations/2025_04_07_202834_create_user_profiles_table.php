@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('userId')->constrained('users')->onDelete('cascade');
             $table->string('knowledgeLevel')->nullable();
-            $table->int('availableTime')->nullable();
+            $table->string('interest')->nullable();
+            $table->int('availableHoursTime')->nullable();
             $table->int('budget')->nullable();
             $table->string('platformPreference')->nullable();
             $table->timestamps();

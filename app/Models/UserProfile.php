@@ -15,6 +15,7 @@ class UserProfile extends EloquentModel
     protected $fillable = [
         'userId',
         'knowledgeLevel',
+        'interest',
         'availableTime',
         'budget',
         'platformPreference',
@@ -39,13 +40,14 @@ class UserProfile extends EloquentModel
         return $this->belongsTo(User::class, 'userId');
     }
 
-    public function interest()
+    public function interests()
     {
-        return $this->hasMany(UserInterest::class, 'userId');
+        return $this->belongsToMany(Categories::class, 'user_profiles_interests', 'userId', 'categoryId');
     }
 
     public function userCourseRecomended()
     {
         return $this->hasMany(UserCourseRecomended::class, 'userId');
     }
+
 }

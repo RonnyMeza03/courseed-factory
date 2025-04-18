@@ -37,6 +37,6 @@ class Categories extends EloquentModel
 
     public function userInterest()
     {
-        return $this->hasMany(UserInterest::class, 'categoryId');
+        return $this->belongsToMany(UserProfile::class, 'user_profiles_interests', 'categoryId', 'userId');
     }
 }
